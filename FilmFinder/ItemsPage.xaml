@@ -66,11 +66,22 @@
         <!-- Back button and page title -->
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="300"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="120"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}"/>
+            <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}" Height="48" Margin="36,0,0,36" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="48" />
+            <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}" Height="40"/>
+            <TextBlock x:Name="currentLocation" Grid.Column="2" Text="Unknown Location" Style="{StaticResource PageHeaderTextStyle}" Height="40" HorizontalAlignment="Right" />
+            <Button 
+                x:Name="locationUpdateButton"
+                Grid.Column="3" 
+                Click="updateLocation"
+                Style="{StaticResource AppBarButtonStyle}"
+                VerticalAlignment="Bottom"
+                Content="&#xE0EB;"
+                />
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

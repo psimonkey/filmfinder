@@ -60,5 +60,10 @@ namespace FilmFinder
             var groupId = ((SampleDataGroup)e.ClickedItem).UniqueId;
             this.Frame.Navigate(typeof(SplitPage), groupId);
         }
+
+        private void updateLocation(object sender, RoutedEventArgs e)
+        {
+            currentLocation.Text = "Another unknown location";
+        }
     }
 }
