@@ -55,7 +55,7 @@ namespace FilmFinder
             {
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
-                //Associate the frame with a SuspensionManager key                                
+                //Associate the frame with a SuspensionManager key
                 SuspensionManager.RegisterFrame(rootFrame, "AppFrame");
 
                 if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
@@ -85,23 +85,6 @@ namespace FilmFinder
                     throw new Exception("Failed to create initial page");
                 }
             }
-
-            //if (geolocator == null)
-            //{
-            //    geolocator = new Geolocator();
-            //    geolocator.DesiredAccuracy = PositionAccuracy.Default;
-            //}
-
-            //if (currentPosition == null)
-            //{
-            //    currentPosition = new UserPosition(geolocator);
-            //}
-
-            ////if (newPosition == null)
-            ////{
-            ////    newPosition = new UserPosition(geolocator);
-            ////}
-            //currentPosition.getVenuesAsync();
 
             // Ensure the current window is active
             Window.Current.Activate();

@@ -42,9 +42,8 @@ namespace FilmFinder
         /// session.  This will be null the first time a page is visited.</param>
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
-            // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var sampleDataGroups = CinemaDataSource.GetCinemas((String)navigationParameter);
-            this.DefaultViewModel["Items"] = sampleDataGroups;
+            var cinemaDataCinemas = CinemaDataSource.GetCinemas((String)navigationParameter);
+            this.DefaultViewModel["Items"] = cinemaDataCinemas;
         }
         
         /// <summary>
