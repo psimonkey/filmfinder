@@ -43,7 +43,7 @@ namespace FilmFinder
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
+            var sampleDataGroups = CinemaDataSource.GetCinemas((String)navigationParameter);
             this.DefaultViewModel["Items"] = sampleDataGroups;
         }
         
@@ -57,7 +57,7 @@ namespace FilmFinder
         {
             // Navigate to the appropriate destination page, configuring the new page
             // by passing required information as a navigation parameter
-            var groupId = ((SampleDataGroup)e.ClickedItem).UniqueId;
+            var groupId = ((CinemaDataCinema)e.ClickedItem).UniqueId;
             this.Frame.Navigate(typeof(SplitPage), groupId);
         }
 

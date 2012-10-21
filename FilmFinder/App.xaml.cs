@@ -28,11 +28,6 @@ namespace FilmFinder
     /// </summary>
     sealed partial class App : Application
     {
-
-        Geolocator geolocator = null;
-        UserPosition currentPosition = null;
-        UserPosition newPosition = null;
-
         /// <summary>
         /// Initializes the singleton Application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -91,22 +86,22 @@ namespace FilmFinder
                 }
             }
 
-            if (geolocator == null)
-            {
-                geolocator = new Geolocator();
-                geolocator.DesiredAccuracy = PositionAccuracy.Default;
-            }
-
-            if (currentPosition == null)
-            {
-                currentPosition = new UserPosition(geolocator);
-            }
-
-            //if (newPosition == null)
+            //if (geolocator == null)
             //{
-            //    newPosition = new UserPosition(geolocator);
+            //    geolocator = new Geolocator();
+            //    geolocator.DesiredAccuracy = PositionAccuracy.Default;
             //}
-            currentPosition.getVenuesAsync();
+
+            //if (currentPosition == null)
+            //{
+            //    currentPosition = new UserPosition(geolocator);
+            //}
+
+            ////if (newPosition == null)
+            ////{
+            ////    newPosition = new UserPosition(geolocator);
+            ////}
+            //currentPosition.getVenuesAsync();
 
             // Ensure the current window is active
             Window.Current.Activate();

@@ -153,7 +153,7 @@ namespace FilmFinder.Data
                 case NotifyCollectionChangedAction.Add:
                     if (e.NewStartingIndex < 12)
                     {
-                        TopItems.Insert(e.NewStartingIndex,Items[e.NewStartingIndex]);
+                        TopItems.Insert(e.NewStartingIndex, Items[e.NewStartingIndex]);
                         if (TopItems.Count > 12)
                         {
                             TopItems.RemoveAt(12);
@@ -211,7 +211,7 @@ namespace FilmFinder.Data
         private ObservableCollection<SampleDataItem> _topItem = new ObservableCollection<SampleDataItem>();
         public ObservableCollection<SampleDataItem> TopItems
         {
-            get {return this._topItem; }
+            get { return this._topItem; }
         }
     }
 
@@ -234,7 +234,7 @@ namespace FilmFinder.Data
         public static IEnumerable<SampleDataGroup> GetGroups(string uniqueId)
         {
             if (!uniqueId.Equals("AllGroups")) throw new ArgumentException("Only 'AllGroups' is supported as a collection of groups");
-            
+
             return _sampleDataSource.AllGroups;
         }
 

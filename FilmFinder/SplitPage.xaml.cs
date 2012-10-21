@@ -45,7 +45,7 @@ namespace FilmFinder
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var group = SampleDataSource.GetGroup((String)navigationParameter);
+            var group = CinemaDataSource.GetCinema((String)navigationParameter);
             this.DefaultViewModel["Group"] = group;
             this.DefaultViewModel["Items"] = group.Items;
 
@@ -64,7 +64,7 @@ namespace FilmFinder
                 // Restore the previously saved state associated with this page
                 if (pageState.ContainsKey("SelectedItem") && this.itemsViewSource.View != null)
                 {
-                    var selectedItem = SampleDataSource.GetItem((String)pageState["SelectedItem"]);
+                    var selectedItem = CinemaDataSource.GetItem((String)pageState["SelectedItem"]);
                     this.itemsViewSource.View.MoveCurrentTo(selectedItem);
                 }
             }
@@ -80,7 +80,7 @@ namespace FilmFinder
         {
             if (this.itemsViewSource.View != null)
             {
-                var selectedItem = (SampleDataItem)this.itemsViewSource.View.CurrentItem;
+                var selectedItem = (CinemaDataFilm)this.itemsViewSource.View.CurrentItem;
                 if (selectedItem != null) pageState["SelectedItem"] = selectedItem.UniqueId;
             }
         }
