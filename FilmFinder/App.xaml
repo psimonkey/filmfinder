@@ -18,7 +18,7 @@
 
             <!-- Application-specific resources -->
 
-            <x:String x:Key="AppName">FilmFinder</x:String>
+            <x:String x:Key="AppName">Film Finder</x:String>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

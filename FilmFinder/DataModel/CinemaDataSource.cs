@@ -29,10 +29,6 @@ namespace FilmFinder.Data
     {
         private static Uri _baseUri = new Uri("ms-appx:///");
 
-        public CinemaDataCommon()
-        {
-        }
-
         public CinemaDataCommon(String uniqueId, String title, String subtitle, String imagePath, String description)
         {
             this._uniqueId = uniqueId;
@@ -133,27 +129,126 @@ namespace FilmFinder.Data
     /// <summary>
     /// Generic group data model.
     /// </summary>
-    public class CinemaDataCinema : CinemaDataCommon
+    [Windows.Foundation.Metadata.WebHostHidden]
+    public class CinemaDataCinema : FilmFinder.Common.BindableBase
     {
+        private static Uri _baseUri = new Uri("ms-appx:///");
+        private GoogleLocationSearchResult.Result _cinema = null;
+        private GoogleLocationDetailResult.Result _cinemadetail = null;
+
         public CinemaDataCinema(String uniqueId, String title, String subtitle, String imagePath, String description)
-            : base(uniqueId, title, subtitle, imagePath, description)
         {
+            this._uniqueId = uniqueId;
+            this._title = title;
+            this._subtitle = subtitle;
+            this._description = description;
+            this._imagePath = imagePath;
             Items.CollectionChanged += ItemsCollectionChanged;
         }
 
         public CinemaDataCinema(GoogleLocationSearchResult.Result cinema)
         {
-            this.UniqueId = cinema.id;
-            this.Title = cinema.name;
-            this.Subtitle = cinema.vicinity;
-            this.Description = cinema.vicinity;
-            this.SetImage("");
-            this.Description = cinema.vicinity;
+            this._cinema = cinema;
+            SetImage(cinema.icon);
+            Items.CollectionChanged += ItemsCollectionChanged;
         }
 
-        //public CinemaDataCinema(GoogleLocationSearchResult.Result cinema, GoogleLocationDetailResult.Result cinemadetail)
-        //{
-        //}
+        public CinemaDataCinema(GoogleLocationSearchResult.Result cinema, GoogleLocationDetailResult.Result cinemadetail)
+        {
+            this._cinema = cinema;
+            this._cinemadetail = cinemadetail;
+            SetImage(cinemadetail.icon);
+            Items.CollectionChanged += ItemsCollectionChanged;
+        }
+
+        private string _uniqueId = string.Empty;
+        public string UniqueId
+        {
+            get {
+                if (this._cinemadetail != null) return this._cinemadetail.id;
+                if (this._cinema != null) return this._cinema.id;
+                return this._uniqueId;
+            }
+        }
+
+        private string _title = string.Empty;
+        public string Title
+        {
+            get {
+                if (this._cinemadetail != null) return this._cinemadetail.name;
+                if (this._cinema != null) return this._cinema.name;
+                return this._title;
+            }
+        }
+
+        private Uri _website = null;
+        public Uri Website
+        {
+            get
+            {
+                if (this._cinemadetail != null) this._website = new Uri(this._cinemadetail.website);
+                return this._website;
+            }
+        }
+
+        public string FormattedAddress
+        {
+            get {
+                if (this._cinemadetail != null) return this._cinemadetail.formatted_address + "\n" + this._cinemadetail.formatted_phone_number;
+                return this._cinema.vicinity;
+            }
+        }
+
+        private string _subtitle = string.Empty;
+        public string Subtitle
+        {
+            get {
+                if (this._cinemadetail != null) return this._cinemadetail.name;
+                if (this._cinema != null) return this._cinema.name;
+                return this._subtitle;
+            }
+        }
+
+        private string _description = string.Empty;
+        public string Description
+        {
+            get {
+                if (this._cinemadetail != null) return this._cinemadetail.name;
+                if (this._cinema != null) return this._cinema.name;
+                return this._description;
+            }
+        }
+
+        private ImageSource _image = null;
+        private String _imagePath = null;
+        public ImageSource Image
+        {
+            get {
+                if (this._image == null && this._imagePath != null)
+                {
+                    this._image = new BitmapImage(new Uri(_baseUri, this._imagePath));
+                }
+                return this._image;
+            }
+
+            set
+            {
+                this._imagePath = null;
+                this.SetProperty(ref this._image, value);
+            }
+        }
+
+        public void SetImage(String path)
+        {
+            this._image = null;
+            this._imagePath = path;
+            this.OnPropertyChanged("Image");
+        }
+
+        public override string ToString()
+        {
+            return this.Title;
+        }
 
         private void ItemsCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -237,7 +332,8 @@ namespace FilmFinder.Data
     /// </summary>
     public sealed class CinemaDataSource
     {
-        private static CinemaDataSource _cinemaDataSource = new CinemaDataSource();
+        public static CinemaDataSource _cinemaDataSource = new CinemaDataSource();
+        public String _locality = "Searching...";
 
         private String ITEM_CONTENT = String.Format("Item Content: {0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}",
                         "Curabitur class aliquam vestibulum nam curae maecenas sed integer cras phasellus suspendisse quisque donec dis praesent accumsan bibendum pellentesque condimentum adipiscing etiam consequat vivamus dictumst aliquam duis convallis scelerisque est parturient ullamcorper aliquet fusce suspendisse nunc hac eleifend amet blandit facilisi condimentum commodo scelerisque faucibus aenean ullamcorper ante mauris dignissim consectetuer nullam lorem vestibulum habitant conubia elementum pellentesque morbi facilisis arcu sollicitudin diam cubilia aptent vestibulum auctor eget dapibus pellentesque inceptos leo egestas interdum nulla consectetuer suspendisse adipiscing pellentesque proin lobortis sollicitudin augue elit mus congue fermentum parturient fringilla euismod feugiat");
@@ -258,42 +354,56 @@ namespace FilmFinder.Data
             }
         }
 
-        public async Task<String> FetchCinemaDetailsAsync(GoogleLocationSearchResult.Result cinema)
+        public async Task<String> GoogleRequest(String url)
         {
-            var pos = await GetPositionAsync();
-            string url = "https://maps.googleapis.com/maps/api/place/details/json?" +
-                "key=AIzaSyC2xB1ebU-zMok06yqdFbLY_TjSF2LztmM&sensor=true" +
-                "&reference=" + cinema.reference;
-            Debug.WriteLine("Detail: " + url);
+            Debug.WriteLine("URL: " + url);
             WebRequest req = WebRequest.Create(url);
             WebResponse res = await req.GetResponseAsync();
             Stream inputStream = res.GetResponseStream();
             StreamReader reader = new StreamReader(inputStream);
-            string json = reader.ReadToEnd();
-            return json;
-            //var cinemas = JsonConvert.DeserializeObject<GoogleLocationSearchResult>(json);
+            return reader.ReadToEnd();
+        }
+
+        public async Task<GoogleLocationDetailResult> FetchCinemaDetailsAsync(GoogleLocationSearchResult.Result cinema)
+        {
+            return JsonConvert.DeserializeObject<GoogleLocationDetailResult>(
+                await GoogleRequest("https://maps.googleapis.com/maps/api/place/details/json?" +
+                    "key=AIzaSyC2xB1ebU-zMok06yqdFbLY_TjSF2LztmM&sensor=true" +
+                    "&reference=" + cinema.reference
+                    )
+                );
+        }
+
+        public async Task FetchLocalityAsync()
+        {
+            var pos = await GetPositionAsync();
+            var l = JsonConvert.DeserializeObject<GoogleLocationLocalityResult>(
+                await GoogleRequest("https://maps.googleapis.com/maps/api/place/search/json?" +
+                    "key=AIzaSyC2xB1ebU-zMok06yqdFbLY_TjSF2LztmM&sensor=true" +
+                    "&types=locality&radius=6000&" +
+                    "&location=" + pos.Coordinate.Latitude.ToString() + "," + pos.Coordinate.Longitude.ToString()
+                    )
+                );
+            _locality = l.results[0].name;
+            Debug.WriteLine(_locality);
         }
 
         public async void FetchCinemasAsync()
         {
             var pos = await GetPositionAsync();
-            string url = "https://maps.googleapis.com/maps/api/place/search/json?" +
-                "key=AIzaSyC2xB1ebU-zMok06yqdFbLY_TjSF2LztmM&sensor=true" +
-                "&types=movie_theater&radius=16000&" +
-                "&location=" + pos.Coordinate.Latitude.ToString() + "," + pos.Coordinate.Longitude.ToString();
-            Debug.WriteLine("Search: " + url);
-            WebRequest req = WebRequest.Create(url);
-            WebResponse res = await req.GetResponseAsync();
-            Stream inputStream = res.GetResponseStream();
-            StreamReader reader = new StreamReader(inputStream);
-            string json = reader.ReadToEnd();
-            var cinemas = JsonConvert.DeserializeObject<GoogleLocationSearchResult>(json);
+            var cinemas = JsonConvert.DeserializeObject<GoogleLocationSearchResult>(
+                await GoogleRequest("https://maps.googleapis.com/maps/api/place/search/json?" +
+                    "key=AIzaSyC2xB1ebU-zMok06yqdFbLY_TjSF2LztmM&sensor=true" +
+                    "&types=movie_theater&radius=16000&" +
+                    "&location=" + pos.Coordinate.Latitude.ToString() + "," + pos.Coordinate.Longitude.ToString()
+                    )
+                );
             foreach (GoogleLocationSearchResult.Result cinema in cinemas.results)
             {
-                Debug.WriteLine(cinema.name);
+                //Debug.WriteLine(cinema.name);
                 var details = await FetchCinemaDetailsAsync(cinema);
                 //Debug.WriteLine(details);
-                var cdc = new CinemaDataCinema(cinema);
+                var cdc = new CinemaDataCinema(cinema, details.result);
                 cdc.Items.Add(new CinemaDataFilm(cinema.name + "Item-1",
                     "Item Title: 1",
                     "Item Subtitle: 1",
@@ -309,6 +419,41 @@ namespace FilmFinder.Data
                     ITEM_CONTENT,
                     cdc));
                 cdc.Items.Add(new CinemaDataFilm(cinema.name + "Item-3",
+                    "Item Title: 1",
+                    "Item Subtitle: 1",
+                    "Assets/DarkGray.png",
+                    "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
+                    ITEM_CONTENT,
+                    cdc));
+                cdc.Items.Add(new CinemaDataFilm(cinema.name + "Item-4",
+                    "Item Title: 1",
+                    "Item Subtitle: 1",
+                    "Assets/DarkGray.png",
+                    "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
+                    ITEM_CONTENT,
+                    cdc));
+                cdc.Items.Add(new CinemaDataFilm(cinema.name + "Item-4",
+                    "Item Title: 1",
+                    "Item Subtitle: 1",
+                    "Assets/DarkGray.png",
+                    "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
+                    ITEM_CONTENT,
+                    cdc));
+                cdc.Items.Add(new CinemaDataFilm(cinema.name + "Item-4",
+                    "Item Title: 1",
+                    "Item Subtitle: 1",
+                    "Assets/DarkGray.png",
+                    "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
+                    ITEM_CONTENT,
+                    cdc));
+                cdc.Items.Add(new CinemaDataFilm(cinema.name + "Item-4",
+                    "Item Title: 1",
+                    "Item Subtitle: 1",
+                    "Assets/DarkGray.png",
+                    "Item Description: Pellentesque porta, mauris quis interdum vehicula, urna sapien ultrices velit, nec venenatis dui odio in augue. Cras posuere, enim a cursus convallis, neque turpis malesuada erat, ut adipiscing neque tortor ac erat.",
+                    ITEM_CONTENT,
+                    cdc));
+                cdc.Items.Add(new CinemaDataFilm(cinema.name + "Item-4",
                     "Item Title: 1",
                     "Item Subtitle: 1",
                     "Assets/DarkGray.png",
@@ -356,6 +501,7 @@ namespace FilmFinder.Data
 
         public CinemaDataSource()
         {
+            FetchLocalityAsync();
             FetchCinemasAsync();
 
             //var group1 = new CinemaDataCinema("Group-1",
@@ -425,6 +571,28 @@ namespace FilmFinder.Data
         }
     }
 
+    public class GoogleLocationLocalityResult
+    {
+        public List<object> html_attributions { get; set; }
+        public List<Result> results { get; set; }
+        public string status { get; set; }
+        public class Result
+        {
+            public Geometry geometry { get; set; }
+            public string icon { get; set; }
+            public string id { get; set; }
+            public string name { get; set; }
+            public string reference { get; set; }
+            public List<string> types { get; set; }
+            public string vicinity { get; set; }
+        }
+        public class Geometry
+        {
+            public Location location { get; set; }
+            public Viewport viewport { get; set; }
+        }
+    }
+
     public class Location
     {
         public double lat { get; set; }
@@ -446,6 +614,24 @@ namespace FilmFinder.Data
         public string long_name { get; set; }
         public string short_name { get; set; }
         public List<string> types { get; set; }
+    }
+
+    public class Northeast
+    {
+        public double lat { get; set; }
+        public double lng { get; set; }
+    }
+
+    public class Southwest
+    {
+        public double lat { get; set; }
+        public double lng { get; set; }
+    }
+
+    public class Viewport
+    {
+        public Northeast northeast { get; set; }
+        public Southwest southwest { get; set; }
     }
 
 }

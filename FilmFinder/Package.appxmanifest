@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="FilmFinder.App">
-      <VisualElements DisplayName="FilmFinder" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Film Finder" ForegroundText="light" BackgroundColor="#464646">
+      <VisualElements DisplayName="FilmFinder" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Film Finder" ForegroundText="dark" BackgroundColor="#464646">
         <DefaultTile ShowName="allLogos" />
         <SplashScreen Image="Assets\SplashScreen.png" />
       </VisualElements>

@@ -26,6 +26,9 @@ namespace FilmFinder
     /// </summary>
     public sealed partial class ItemsPage : FilmFinder.Common.LayoutAwarePage
     {
+
+        private static CinemaDataSource _cds = null;
+
         public ItemsPage()
         {
             this.InitializeComponent();
@@ -42,10 +45,12 @@ namespace FilmFinder
         /// session.  This will be null the first time a page is visited.</param>
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
+            _cds = CinemaDataSource._cinemaDataSource;
             var cinemaDataCinemas = CinemaDataSource.GetCinemas((String)navigationParameter);
             this.DefaultViewModel["Items"] = cinemaDataCinemas;
+            updateLocation();
         }
-        
+
         /// <summary>
         /// Invoked when an item is clicked.
         /// </summary>
@@ -60,10 +65,16 @@ namespace FilmFinder
             this.Frame.Navigate(typeof(SplitPage), groupId);
         }
 
-        private void updateLocationButtonClick(object sender, RoutedEventArgs e)
+        private async void updateLocation()
         {
             currentLocation.Text = "Searching...";
-            //findNewLocation();
+            await _cds.FetchLocalityAsync();
+            currentLocation.Text = _cds._locality;
+        }
+
+        private void updateLocationButtonClick(object sender, RoutedEventArgs e)
+        {
+            updateLocation();
         }
 
     }

@@ -26,6 +26,8 @@ namespace FilmFinder
     /// </summary>
     public sealed partial class SplitPage : FilmFinder.Common.LayoutAwarePage
     {
+        private static CinemaDataSource _cds = null;
+
         public SplitPage()
         {
             this.InitializeComponent();
@@ -44,7 +46,7 @@ namespace FilmFinder
         /// session.  This will be null the first time a page is visited.</param>
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
-            // TODO: Create an appropriate data model for your problem domain to replace the sample data
+            _cds = CinemaDataSource._cinemaDataSource;
             var group = CinemaDataSource.GetCinema((String)navigationParameter);
             this.DefaultViewModel["Group"] = group;
             this.DefaultViewModel["Items"] = group.Items;
