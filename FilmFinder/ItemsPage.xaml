@@ -77,7 +77,7 @@
             <Button 
                 x:Name="locationUpdateButton"
                 Grid.Column="3" 
-                Click="updateLocation"
+                Click="updateLocationButtonClick"
                 Style="{StaticResource AppBarButtonStyle}"
                 VerticalAlignment="Bottom"
                 Content="&#xE0EB;"

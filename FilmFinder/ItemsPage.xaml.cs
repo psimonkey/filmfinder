@@ -46,7 +46,7 @@ namespace FilmFinder
             var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
             this.DefaultViewModel["Items"] = sampleDataGroups;
         }
-
+        
         /// <summary>
         /// Invoked when an item is clicked.
         /// </summary>
@@ -61,9 +61,11 @@ namespace FilmFinder
             this.Frame.Navigate(typeof(SplitPage), groupId);
         }
 
-        private void updateLocation(object sender, RoutedEventArgs e)
+        private void updateLocationButtonClick(object sender, RoutedEventArgs e)
         {
-            currentLocation.Text = "Another unknown location";
+            currentLocation.Text = "Searching...";
+            //findNewLocation();
         }
+
     }
 }

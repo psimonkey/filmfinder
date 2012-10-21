@@ -1,9 +1,11 @@
 ﻿using FilmFinder.Common;
+using FilmFinder;
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -15,6 +17,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Devices.Geolocation;
 
 // The Split App template is documented at http://go.microsoft.com/fwlink/?LinkId=234228
 
@@ -25,6 +28,11 @@ namespace FilmFinder
     /// </summary>
     sealed partial class App : Application
     {
+
+        Geolocator geolocator = null;
+        UserPosition currentPosition = null;
+        UserPosition newPosition = null;
+
         /// <summary>
         /// Initializes the singleton Application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -82,6 +90,24 @@ namespace FilmFinder
                     throw new Exception("Failed to create initial page");
                 }
             }
+
+            if (geolocator == null)
+            {
+                geolocator = new Geolocator();
+                geolocator.DesiredAccuracy = PositionAccuracy.Default;
+            }
+
+            if (currentPosition == null)
+            {
+                currentPosition = new UserPosition(geolocator);
+            }
+
+            //if (newPosition == null)
+            //{
+            //    newPosition = new UserPosition(geolocator);
+            //}
+            currentPosition.getVenuesAsync();
+
             // Ensure the current window is active
             Window.Current.Activate();
         }
@@ -99,5 +125,6 @@ namespace FilmFinder
             await SuspensionManager.SaveAsync();
             deferral.Complete();
         }
+
     }
 }
